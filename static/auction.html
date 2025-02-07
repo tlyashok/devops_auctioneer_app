@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Аукционы</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans antialiased">
+
+<div class="max-w-4xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
+    <!-- Информация о пользователе -->
+    <div id="userInfo" class="mb-6 flex justify-between items-center text-gray-800">
+        <div>
+            <p>Пользователь: <span id="username">Загрузка...</span></p>
+            <p>Баланс: <span id="userBalance">Загрузка...</span> ₽</p>
+        </div>
+        <button id="logoutButton" class="bg-red-500 text-white py-2 px-6 rounded-lg hover:bg-red-600 transition">Выйти</button>
+    </div>
+
+    <h2 class="text-2xl font-semibold text-center text-gray-800 mb-6">Активные аукционы</h2>
+
+    <!-- Форма создания аукциона -->
+    <div id="createAuctionForm" class="mb-8">
+        <h3 class="text-xl font-semibold text-gray-800">Создать новый аукцион</h3>
+        <form id="auctionForm" class="space-y-4 mt-4">
+            <div>
+                <label for="itemName" class="block text-gray-700">Название товара</label>
+                <input type="text" id="itemName" name="itemName" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" required>
+            </div>
+            <div>
+                <label for="startingPrice" class="block text-gray-700">Начальная цена</label>
+                <input type="number" id="startingPrice" name="startingPrice" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" required>
+            </div>
+            <div>
+                <label for="duration" class="block text-gray-700">Длительность в минутах</label>
+                <input type="number" id="duration" name="duration" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" required>
+            </div>
+            <div>
+                <label for="description" class="block text-gray-700">Описание товара</label>
+                <textarea id="description" name="description" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" required></textarea>
+            </div>
+            <button type="submit" class="w-full bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition">Создать аукцион</button>
+        </form>
+    </div>
+
+    <!-- Список аукционов -->
+    <ul id="auctionList" class="space-y-4">
+        <!-- Здесь будут выводиться аукционы -->
+    </ul>
+
+    <!-- Форма ставки -->
+    <div id="bidForm" class="hidden mt-8">
+        <h3 class="text-xl font-semibold text-gray-800">Сделать ставку</h3>
+        <form id="placeBidForm" class="space-y-4 mt-4">
+            <div>
+                <label for="bidAmount" class="block text-gray-700">Сумма ставки</label>
+                <input type="number" id="bidAmount" name="bidAmount" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" required>
+            </div>
+            <button type="submit" class="w-full bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition">Сделать ставку</button>
+        </form>
+    </div>
+</div>
+
+<script src="auction.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+</body>
+</html>
