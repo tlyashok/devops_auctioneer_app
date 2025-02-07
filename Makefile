@@ -1,7 +1,5 @@
 DB_CONTAINER_NAME=db
 
-all: build
-
 run:
 	@echo "Building the Go application..."
 	go run cmd/main.go

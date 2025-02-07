@@ -2,6 +2,7 @@ package main
 
 import (
 	"auction-app/tasks"
+	"auction-app/utils"
 	"log"
 	"net/http"
 	"os"
@@ -32,6 +33,9 @@ func main() {
 	// Инициализируем БД
 	repository.InitDB(cfg)
 	defer repository.DB.Close()
+
+	// Загружаем секретный ключ для jwt токенов
+	utils.InitSecretKey(cfg)
 
 	// Создаём новый роутер
 	mux := http.NewServeMux()

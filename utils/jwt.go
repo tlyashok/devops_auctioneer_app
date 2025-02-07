@@ -1,17 +1,22 @@
 package utils
 
 import (
+	"auction-app/config"
 	"auction-app/models"
 	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"time"
 )
 
-var secretKey = []byte("секретный_ключ")
+var secretKey []byte
 
 type Claims struct {
 	UserID int `json:"user_id"`
 	jwt.StandardClaims
+}
+
+func InitSecretKey(cfg *config.Config) {
+	secretKey = []byte(cfg.JwtSecretKey)
 }
 
 // Генерация токена
