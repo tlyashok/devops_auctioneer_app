@@ -35,4 +35,3 @@ migrate_up:
 migrate_down:
 	migrate -path migrations -database "postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" down
 
-start: build db run
