@@ -7,11 +7,14 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentMaxBid = 0;
 
     document.getElementById('logoutButton').addEventListener('click', function () {
-        localStorage.removeItem('authToken'); // Удаляем токен авторизации
-        window.location.href = '/'; // Перенаправляем на страницу входа (замени на актуальный URL)
+        localStorage.removeItem('authToken');
+        window.location.href = '/';
     });
 
-    // Загрузка данных пользователя
+    function sanitizeInput(str) {
+        return DOMPurify.sanitize(str);
+    }
+
     function loadUserData() {
         fetch('/users/me', {
             method: 'GET',
@@ -21,15 +24,14 @@ document.addEventListener('DOMContentLoaded', function () {
         })
             .then(response => response.json())
             .then(user => {
-                document.getElementById('username').textContent = user.username;
-                document.getElementById('userBalance').textContent = user.balance;
+                document.getElementById('username').textContent = sanitizeInput(user.username);
+                document.getElementById('userBalance').textContent = sanitizeInput(user.balance.toString());
             })
             .catch(error => {
                 console.error('Ошибка при загрузке данных пользователя:', error);
             });
     }
 
-    // Загрузка аукционов
     function loadAuctions() {
         fetch('/auctions', {
             method: 'GET',
@@ -39,38 +41,33 @@ document.addEventListener('DOMContentLoaded', function () {
         })
             .then(response => response.json())
             .then(auctions => {
-                auctionList.innerHTML = ''; // Очищаем список аукционов
-
+                auctionList.innerHTML = '';
                 auctions.forEach(auction => {
                     const listItem = document.createElement('li');
                     listItem.classList.add('p-4', 'border', 'rounded', 'flex', 'justify-between', 'items-center');
 
-                    // Форматирование дат
                     const startDate = auction.start_time ? new Date(auction.start_time).toLocaleString() : 'Не указана';
                     const endDate = auction.end_time ? new Date(auction.end_time).toLocaleString() : 'Не указана';
 
                     listItem.innerHTML = `
-                <div class="flex-1">
-                    <h1 class="text-xl font-semibold">${auction.title || 'Без названия'}</h1>
-                    <p class="text-gray-700">Статус лота: ${auction.status || 'Не указан'}</p>
-                    <p class="text-gray-700">Начальная цена: ${auction.starting_price || 'Не указана'} ₽</p>
-                    <p class="text-gray-700">Текущая максимальная ставка: ${auction.max_bid || auction.starting_price || 'Не указана'} ₽</p>
-                    <p class="text-gray-700">Создатель: ${auction.creator_username || 'Не указан'}</p>
-                    <p class="text-gray-700">Победитель: ${auction.winner_username || 'Не выбран'}</p>
-                    <p class="text-gray-700">Дата начала: ${startDate}</p>
-                    <p class="text-gray-700">Дата окончания: ${endDate}</p>
-                </div>
-                <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" data-id="${auction.id}">Сделать ставку</button>
-            `;
+                            <div class="flex-1">
+                                <h1 class="text-xl font-semibold">${sanitizeInput(auction.title || 'Без названия')}</h1>
+                                <p class="text-gray-700">Статус: ${sanitizeInput(auction.status || 'Не указан')}</p>
+                                <p class="text-gray-700">Начальная цена: ${sanitizeInput(auction.starting_price?.toString() || 'Не указана')} ₽</p>
+                                <p class="text-gray-700">Макс. ставка: ${sanitizeInput(auction.max_bid?.toString() || auction.starting_price?.toString() || 'Не указана')} ₽</p>
+                                <p class="text-gray-700">Создатель: ${sanitizeInput(auction.creator_username || 'Не указан')}</p>
+                                <p class="text-gray-700">Победитель: ${sanitizeInput(auction.winner_username || 'Не выбран')}</p>
+                                <p class="text-gray-700">Дата начала: ${startDate}</p>
+                                <p class="text-gray-700">Дата окончания: ${endDate}</p>
+                            </div>
+                            <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" data-id="${auction.id}">Сделать ставку</button>
+                        `;
 
                     auctionList.appendChild(listItem);
 
-                    // Обработчик клика по кнопке "Сделать ставку"
                     listItem.querySelector('button').addEventListener('click', function () {
                         selectedAuctionId = auction.id;
                         currentMaxBid = auction.max_bid || auction.starting_price || 0;
-
-                        // Показываем форму ставки
                         bidForm.classList.remove('hidden');
                     });
                 });
@@ -78,12 +75,10 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Ошибка при загрузке аукционов:', error));
     }
 
-    // Обработчик ставки
     placeBidForm.addEventListener('submit', function (e) {
         e.preventDefault();
         const bidAmount = parseFloat(document.getElementById('bidAmount').value);
 
-        // Проверка, что ставка больше текущей максимальной ставки
         if (isNaN(bidAmount) || bidAmount <= currentMaxBid) {
             alert('Ставка должна быть больше текущей максимальной ставки.');
             return;
@@ -104,10 +99,10 @@ document.addEventListener('DOMContentLoaded', function () {
         })
             .then(response => response.json())
             .then(data => {
-                if ("ID" in data) { // Если ставка успешно создана, скрыть форму и обновить аукционы
+                if ("ID" in data) {
                     alert('Ставка успешно сделана!');
                     bidForm.classList.add('hidden');
-                    loadAuctions(); // Перезагружаем список аукционов
+                    loadAuctions();
                 } else {
                     throw data;
                 }
@@ -117,20 +112,19 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     });
 
-    // Обработчик формы создания аукциона
     auctionForm.addEventListener('submit', function (e) {
         e.preventDefault();
 
-        const itemName = document.getElementById('itemName').value;
-        const description = document.getElementById('description').value;
-        const duration = document.getElementById('duration').value;
-        const startingPrice = document.getElementById('startingPrice').value;
+        const itemName = sanitizeInput(document.getElementById('itemName').value);
+        const description = sanitizeInput(document.getElementById('description').value);
+        const duration = parseInt(document.getElementById('duration').value, 10);
+        const startingPrice = parseInt(document.getElementById('startingPrice').value, 10);
 
         const auctionData = {
             title: itemName,
             description: description,
-            duration: parseInt(duration),
-            starting_price: parseInt(startingPrice)
+            duration: duration,
+            starting_price: startingPrice
         };
 
         fetch('/auctions', {
@@ -144,13 +138,13 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => response.json())
             .then(data => {
                 alert('Аукцион успешно создан!');
-                loadAuctions(); // Перезагружаем список аукционов
+                loadAuctions();
             })
             .catch(error => {
                 alert('Ошибка при создании аукциона');
             });
     });
 
-    loadUserData();  // Загружаем информацию о пользователе
-    loadAuctions();  // Загружаем список аукционов
+    loadUserData();
+    loadAuctions();
 });
