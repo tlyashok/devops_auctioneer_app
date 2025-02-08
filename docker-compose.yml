@@ -8,12 +8,36 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
+      - DB_PORT=${DB_PORT}
+      - PGPORT=${DB_PORT}
     ports:
-      - "${DB_PORT}:5432"
+      - "${DB_PORT}:${DB_PORT}"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - auction_network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: auction_app
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+    env_file:
+      - .env
+    networks:
+      - auction_network
+    command: ["/bin/sh", "-c", "migrate -path ./migrations -database 'postgres://${DB_USER}:${DB_PASSWORD}@db:${DB_PORT}/${DB_NAME}?sslmode=disable' up && ./server"]
 
 networks:
   auction_network:

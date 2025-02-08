@@ -8,6 +8,18 @@ import (
 	"strconv"
 )
 
+// AuctionsHandler - обработчик для работы с аукционами.
+func AuctionsHandler(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodPost:
+		CreateAuction(w, r)
+	case http.MethodGet:
+		GetAuctions(w, r)
+	default:
+		http.Error(w, "Метод не поддерживается", http.StatusMethodNotAllowed)
+	}
+}
+
 // Создание аукциона: POST /auctions
 func CreateAuction(w http.ResponseWriter, r *http.Request) {
 	var createAuction models.CreateAuctionRequest

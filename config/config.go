@@ -15,23 +15,28 @@ type Config struct {
 	DBPassword   string
 	DBName       string
 	JwtSecretKey string
+	AppPort      string
 }
 
 func LoadConfig() *Config {
 	// Загружаем переменные из .env файла
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Printf("Using environment variables from docker or os")
+
+	} else {
+		log.Printf("Using .env file")
 	}
 
 	// Возвращаем структуру с конфигурацией
 	return &Config{
 		DBHost:       getEnv("DB_HOST", "auction-db"),
-		DBPort:       getEnv("DB_PORT", "5433"),
+		DBPort:       getEnv("DB_PORT", "5432"),
 		DBUser:       getEnv("DB_USER", "postgres"),
 		DBPassword:   getEnv("DB_PASSWORD", "password"),
 		DBName:       getEnv("DB_NAME", "auction_db"),
 		JwtSecretKey: getEnv("JWT_SECRET_KEY", "your_default_jwt_secret_key"),
+		AppPort:      getEnv("APP_PORT", "8000"),
 	}
 }
 

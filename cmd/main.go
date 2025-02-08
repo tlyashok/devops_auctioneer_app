@@ -3,9 +3,11 @@ package main
 import (
 	"auction-app/tasks"
 	"auction-app/utils"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"auction-app/config"
 	"auction-app/repository"
@@ -50,9 +52,14 @@ func main() {
 	// Фоновый обработчик статусов лотов
 	go tasks.MonitorAuctions()
 
-	// Запускаем сервер
-	log.Println("Сервер запущен на порту 8000...")
-	if err := http.ListenAndServe(":8000", mux); err != nil {
-		log.Fatalf("Ошибка сервера: %v", err)
+	log.Println("Сервер запущен на порту", 8000)
+	port, _ := strconv.Atoi(cfg.AppPort)
+	if port == 0 {
+		port = 8080 // Устанавливаем порт по умолчанию, если ошибка
+	}
+
+	// Запуск сервера
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), mux); err != nil {
+		fmt.Printf("Ошибка при запуске сервера: %v\n", err)
 	}
 }

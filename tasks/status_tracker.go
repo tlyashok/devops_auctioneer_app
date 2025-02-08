@@ -7,7 +7,7 @@ import (
 )
 
 func MonitorAuctions() {
-	ticker := time.NewTicker(1 * time.Second) // Проверка каждую минуту
+	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
 
 	for range ticker.C {
