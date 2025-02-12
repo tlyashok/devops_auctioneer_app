@@ -129,13 +129,13 @@ func GetAuctions(w http.ResponseWriter, r *http.Request) {
 		creator, err := models.GetUserByID(auction.CreatorID)
 		if err != nil {
 			creator = &models.User{
-				Username: "Unknown",
+				Username: "Не указан",
 			}
 		}
 		winner, err := models.GetUserByID(auction.WinnerID)
 		if err != nil {
 			winner = &models.User{
-				Username: "Unknown",
+				Username: "Не выбран",
 			}
 		}
 
