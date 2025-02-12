@@ -69,7 +69,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         listItem.innerHTML += '<button disabled class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600" data-id="${auction.id}">Лот закрыт</button>'
                     else
                         listItem.innerHTML += '<button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" data-id="${auction.id}">Сделать ставку</button>'
-
                     auctionList.appendChild(listItem);
 
                     listItem.querySelector('button').addEventListener('click', function () {
