@@ -12,7 +12,11 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     function sanitizeInput(str) {
-        return DOMPurify.sanitize(str);
+        return str.replaceAll("&", "&amp;")
+                  .replaceAll("<", "&lt;")
+                  .replaceAll(">", "&gt;")
+                  .replaceAll("\"", "&quot;")
+                  .replaceAll("\'", "&apos;")
     }
 
     function loadUserData() {
@@ -54,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <p class="text-gray-700">Статус лота: ${sanitizeInput(auction.status || 'Не указан')}</p>
                     <p class="text-gray-700 break-all">Описание товара: ${sanitizeInput(auction.starting_price?.toString() || 'Не указана')}</p>
                     <p class="text-gray-700">Начальная цена: ${sanitizeInput(auction.starting_price?.toString() || 'Не указана')} ₽</p>
-                    <p class="text-gray-700">Текущая максимальная ставка: ${sanitizeInput(auction.max_bid?.toString() || auction.starting_price?.toString() || 'Не указана')} ₽</p>
+                    <p class="text-gray-700">Текущая максимальная ставка: ${sanitizeInput(auction.max_bid?.toString() || 'Ставок нет')} ₽</p>
                     <p class="text-gray-700">Создатель: ${sanitizeInput(auction.creator_username || 'Не указан')}</p>
                     <p class="text-gray-700">Победитель: ${sanitizeInput(auction.winner_username || 'Не выбран')}</p>
                     <p class="text-gray-700">Дата начала: ${startDate}</p>
@@ -118,8 +122,8 @@ document.addEventListener('DOMContentLoaded', function () {
     auctionForm.addEventListener('submit', function (e) {
         e.preventDefault();
 
-        const itemName = sanitizeInput(document.getElementById('itemName').value);
-        const description = sanitizeInput(document.getElementById('description').value);
+        const itemName = document.getElementById('itemName').value;
+        const description = document.getElementById('description').value;
         const duration = parseInt(document.getElementById('duration').value, 10);
         const startingPrice = parseInt(document.getElementById('startingPrice').value, 10);
 
