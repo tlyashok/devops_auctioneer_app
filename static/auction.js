@@ -12,7 +12,11 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     function sanitizeInput(str) {
-        return DOMPurify.sanitize(str);
+        return str.replaceAll("&", "&amp;")
+                  .replaceAll("<", "&lt;")
+                  .replaceAll(">", "&gt;")
+                  .replaceAll("\"", "&quot;")
+                  .replaceAll("\'", "&apos;")
     }
 
     function loadUserData() {
@@ -48,21 +52,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     const startDate = auction.start_time ? new Date(auction.start_time).toLocaleString() : 'Не указана';
                     const endDate = auction.end_time ? new Date(auction.end_time).toLocaleString() : 'Не указана';
-
                     listItem.innerHTML = `
-                            <div class="flex-1">
-                                <h1 class="text-xl font-semibold">${sanitizeInput(auction.title || 'Без названия')}</h1>
-                                <p class="text-gray-700">Статус: ${sanitizeInput(auction.status || 'Не указан')}</p>
-                                <p class="text-gray-700">Начальная цена: ${sanitizeInput(auction.starting_price?.toString() || 'Не указана')} ₽</p>
-                                <p class="text-gray-700">Макс. ставка: ${sanitizeInput(auction.max_bid?.toString() || auction.starting_price?.toString() || 'Не указана')} ₽</p>
-                                <p class="text-gray-700">Создатель: ${sanitizeInput(auction.creator_username || 'Не указан')}</p>
-                                <p class="text-gray-700">Победитель: ${sanitizeInput(auction.winner_username || 'Не выбран')}</p>
-                                <p class="text-gray-700">Дата начала: ${startDate}</p>
-                                <p class="text-gray-700">Дата окончания: ${endDate}</p>
-                            </div>
-                            <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" data-id="${auction.id}">Сделать ставку</button>
-                        `;
-
+                <div class="flex-1">
+                    <h1 class="text-xl font-semibold break-all">${sanitizeInput(auction.title || 'Без названия')}</h1>
+                    <p class="text-gray-700">Статус лота: ${sanitizeInput(auction.status || 'Не указан')}</p>
+                    <p class="text-gray-700 break-all">Описание товара: ${sanitizeInput(auction.starting_price?.toString() || 'Не указана')}</p>
+                    <p class="text-gray-700">Начальная цена: ${sanitizeInput(auction.starting_price?.toString() || 'Не указана')} ₽</p>
+                    <p class="text-gray-700">Текущая максимальная ставка: ${sanitizeInput(auction.max_bid?.toString() || 'Ставок нет')} ₽</p>
+                    <p class="text-gray-700">Создатель: ${sanitizeInput(auction.creator_username || 'Не указан')}</p>
+                    <p class="text-gray-700">Победитель: ${sanitizeInput(auction.winner_username || 'Не выбран')}</p>
+                    <p class="text-gray-700">Дата начала: ${startDate}</p>
+                    <p class="text-gray-700">Дата окончания: ${endDate}</p>
+                </div>
+            `;
+                    if (auction.status == 'Закрыт')
+                        listItem.innerHTML += '<button disabled class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600" data-id="${auction.id}">Лот закрыт</button>'
+                    else
+                        listItem.innerHTML += '<button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" data-id="${auction.id}">Сделать ставку</button>'
                     auctionList.appendChild(listItem);
 
                     listItem.querySelector('button').addEventListener('click', function () {
@@ -115,8 +121,8 @@ document.addEventListener('DOMContentLoaded', function () {
     auctionForm.addEventListener('submit', function (e) {
         e.preventDefault();
 
-        const itemName = sanitizeInput(document.getElementById('itemName').value);
-        const description = sanitizeInput(document.getElementById('description').value);
+        const itemName = document.getElementById('itemName').value;
+        const description = document.getElementById('description').value;
         const duration = parseInt(document.getElementById('duration').value, 10);
         const startingPrice = parseInt(document.getElementById('startingPrice').value, 10);
 

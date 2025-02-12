@@ -14,9 +14,9 @@ const (
 func StatusToString(status int) string {
 	switch status {
 	case StatusActive:
-		return "Active"
+		return "Активен"
 	case StatusCompleted:
-		return "Completed"
+		return "Закрыт"
 	}
 	return "Undefined"
 }
